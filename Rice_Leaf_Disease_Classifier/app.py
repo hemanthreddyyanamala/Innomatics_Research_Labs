@@ -69,7 +69,7 @@ def main():
                 
                 # Probability table
                 prob_df = pd.DataFrame({
-                    'Disease': ['Brownspot', 'Bacterialblight', 'Leafsmut'],
+                    'Disease': ['Bacterialblight', 'Brownspot', 'Leafsmut'],
                     'Probability': [f"{p:.1%}" for p in probability]
                 })
                 st.dataframe(prob_df, use_container_width=True)
@@ -146,5 +146,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
