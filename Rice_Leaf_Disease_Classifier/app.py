@@ -129,15 +129,15 @@ def main():
             
             # Brownspot
             st.markdown("**Brownspot** - Small, circular brown spots on leaves")
-            st.image("brownspot_orig_098.jpg", width=200)
+            st.image("Rice_Leaf_Disease_Classifier/brownspot_orig_098.jpg", width=200)
             
             # Bacterialblight  
             st.markdown("**Bacterial Blight** - Yellowish streaks turning grayish white")
-            st.image("BACTERAILBLIGHT3_191.jpg", width=200)
+            st.image("Rice_Leaf_Disease_Classifier/BACTERAILBLIGHT3_191.jpg", width=200)
             
             # Leafsmut
             st.markdown("**Leaf Smut** - Black powdery masses on leaf surfaces")
-            st.image("BLAST1_075.jpg", width=200)
+            st.image("Rice_Leaf_Disease_Classifier/BLAST1_075.jpg", width=200)
             
             st.markdown("</div>", unsafe_allow_html=True)
 
@@ -146,4 +146,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
