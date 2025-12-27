@@ -27,7 +27,7 @@ st.markdown("""
 
 @st.cache_resource
 def load_model():
-    with open('rice_leaf_diseases.pkl', 'rb') as f:
+    with open('Rice_Leaf_Disease_Classifier/rice_leaf_diseases.pkl', 'rb') as f:
         return pickle.load(f)
 
 model = load_model()
@@ -146,3 +146,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
