@@ -96,9 +96,9 @@ st.write("Predict disease stage using genetic, clinical, and genetic modifier pa
 
 @st.cache_resource
 def load_artifacts():
-    with open("Huntington_Disease.pkl", "rb") as f:
+    with open("Huntington_Disease/Huntington_Disease.pkl", "rb") as f:
         model = pickle.load(f)
-    with open("preprocessing.pkl", "rb") as f:
+    with open("Huntington_Disease/preprocessing.pkl", "rb") as f:
         preprocessor = pickle.load(f)
     return model, preprocessor
 
@@ -373,3 +373,4 @@ if st.button(" Predict Disease Stage", type="primary"):
 
 st.markdown("---")
 st.caption(" Built with Streamlit | ML Deployment | By Hemanth")
+
