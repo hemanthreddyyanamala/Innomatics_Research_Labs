@@ -336,15 +336,13 @@ if st.button(" Predict Disease Stage", type="primary"):
         ]
     )
 
-    # ✅ FIX: Convert to numpy array (Pipeline expects this)
-    transformed_input = input_data.values  # or input_data.to_numpy()
-
-    prediction = model.predict(transformed_input)[0]
+    # ✅ FIX: Let Pipeline handle everything - pass DataFrame directly
+    prediction = model.predict(input_data)[0]  # No .values needed!
 
     st.success(f" **Predicted Disease Stage: {prediction}**")
 
     if hasattr(model, "predict_proba"):
-        proba = model.predict_proba(transformed_input)[0]
+        proba = model.predict_proba(input_data)[0]
         confidence = float(np.max(proba) * 100)
         st.info(f" Prediction Confidence: **{confidence:.1f}%**")
 
@@ -353,6 +351,7 @@ if st.button(" Predict Disease Stage", type="primary"):
             "Probability": [f"{p:.1%}" for p in proba]
         })
         st.dataframe(prob_df, use_container_width=True)
+
 
 # if st.button(" Predict Disease Stage", type="primary"):
 
@@ -415,4 +414,5 @@ if st.button(" Predict Disease Stage", type="primary"):
 
 st.markdown("---")
 st.caption(" Built with Streamlit | ML Deployment | By Hemanth")
+
 
