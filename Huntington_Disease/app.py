@@ -317,80 +317,7 @@ with right_col:
             "- **Cis‑acting Modifier**: a nearby gene that also changes how severe the disease is."
         )
 
-if st.button(" Predict Disease Stage", type="primary"):
-    input_data = pd.DataFrame(
-        [[
-            age, sex, family_history, htt_cag_repeat_length,
-            motor_symptoms, cognitive_decline, chorea_score,
-            brain_volume_loss, functional_capacity,
-            gene_mutation_type, htt_gene_expression_level,
-            protein_aggregation_level, gene_factor,
-            chromosome_location, function, effect, category
-        ]],
-        columns=[
-            "Age", "Sex", "Family_History", "HTT_CAG_Repeat_Length",
-            "Motor_Symptoms", "Cognitive_Decline", "Chorea_Score",
-            "Brain_Volume_Loss", "Functional_Capacity", "Gene_Mutation_Type",
-            "HTT_Gene_Expression_Level", "Protein_Aggregation_Level",
-            "Gene/Factor", "Chromosome_Location", "Function", "Effect", "Category"
-        ]
-    )
-# Stage mapping for user-friendly display
-stage_names = {
-    0: "Stage 0 - Pre-symptomatic", 
-    1: "Stage 1 - Early Symptoms", 
-    2: "Stage 2 - Moderate", 
-    3: "Stage 3 - Severe", 
-    4: "Stage 4 - Advanced"
-}
-
-if st.button(" Predict Disease Stage", type="primary"):
-    input_data = pd.DataFrame(
-        [[
-            age, sex, family_history, htt_cag_repeat_length,
-            motor_symptoms, cognitive_decline, chorea_score,
-            brain_volume_loss, functional_capacity,
-            gene_mutation_type, htt_gene_expression_level,
-            protein_aggregation_level, gene_factor,
-            chromosome_location, function, effect, category
-        ]],
-        columns=[
-            "Age", "Sex", "Family_History", "HTT_CAG_Repeat_Length",
-            "Motor_Symptoms", "Cognitive_Decline", "Chorea_Score",
-            "Brain_Volume_Loss", "Functional_Capacity", "Gene_Mutation_Type",
-            "HTT_Gene_Expression_Level", "Protein_Aggregation_Level",
-            "Gene/Factor", "Chromosome_Location", "Function", "Effect", "Category"
-        ]
-    )
-
 # Stage mapping for user-friendly display (LabelEncoder alphabetical order)
-stage_names = {
-    0: "Early",              # Alphabetical 1st
-    1: "Late",               # Alphabetical 2nd  
-    2: "Middle",             # Alphabetical 3rd
-    3: "Pre-Symptomatic"     # Alphabetical 4th
-}
-
-if st.button(" Predict Disease Stage", type="primary"):
-    input_data = pd.DataFrame(
-        [[
-            age, sex, family_history, htt_cag_repeat_length,
-            motor_symptoms, cognitive_decline, chorea_score,
-            brain_volume_loss, functional_capacity,
-            gene_mutation_type, htt_gene_expression_level,
-            protein_aggregation_level, gene_factor,
-            chromosome_location, function, effect, category
-        ]],
-        columns=[
-            "Age", "Sex", "Family_History", "HTT_CAG_Repeat_Length",
-            "Motor_Symptoms", "Cognitive_Decline", "Chorea_Score",
-            "Brain_Volume_Loss", "Functional_Capacity", "Gene_Mutation_Type",
-            "HTT_Gene_Expression_Level", "Protein_Aggregation_Level",
-            "Gene/Factor", "Chromosome_Location", "Function", "Effect", "Category"
-        ]
-    )
-
- # Stage mapping for user-friendly display (LabelEncoder alphabetical order)
 stage_names = {
     0: "Early",              
     1: "Late",               
@@ -398,7 +325,9 @@ stage_names = {
     3: "Pre-Symptomatic"     
 }
 
-if st.button(" Predict Disease Stage", type="primary", key="predict_btn"):  # ✅ UNIQUE KEY ADDED
+# ✅ FIXED: Single button with unique key
+if st.button("Predict Disease Stage", type="primary", key="unique_predict_btn"):
+    
     input_data = pd.DataFrame(
         [[
             age, sex, family_history, htt_cag_repeat_length,
@@ -417,34 +346,43 @@ if st.button(" Predict Disease Stage", type="primary", key="predict_btn"):  # �
         ]
     )
 
-    # MLflow Pipeline handles preprocessing - pass DataFrame directly
-    transformed_input = input_data
+    # Model expects DataFrame - handles preprocessing internally
+    prediction_num = model.predict(input_data)[0]
     
-    prediction = model.predict(transformed_input)[0]
-    stage_display = stage_names.get(prediction, f"Stage {prediction}")
+    # ✅ Convert numeric prediction to readable string
+    stage_display = stage_names.get(prediction_num, f"Stage {prediction_num}")
     
-    # Enhanced prediction display
+    # Results display
     st.markdown("---")
     col1, col2 = st.columns([1, 3])
     
     with col1:
         st.success(f"**{stage_display}**")
-        st.caption(f"Label: `{prediction}`")
+        st.caption(f"Model Output: {prediction_num}")
     
     with col2:
         if hasattr(model, "predict_proba"):
-            proba = model.predict_proba(transformed_input)[0]
+            proba = model.predict_proba(input_data)[0]
             confidence = float(np.max(proba) * 100)
             
             st.metric("Confidence", f"{confidence:.1f}%")
             
-            # Clean probability table with correct encoder order
+            # Probability table with correct stage names
             prob_df = pd.DataFrame({
-                "Disease Stage": [stage_names.get(int(i), f"Stage {i}") for i in range(len(model.classes_))],
+                "Disease Stage": [stage_names.get(int(i), f"Stage {i}") for i in range(4)],
                 "Probability": [f"{p:.1%}" for p in proba]
             })
             st.dataframe(prob_df, use_container_width=True, hide_index=True)
     
+    # Clinical interpretation based on numeric prediction
+    if prediction_num == 3:
+        st.info("Low risk - Early intervention recommended")
+    elif prediction_num == 2:
+        st.warning("Moderate risk - Regular monitoring advised")
+    elif prediction_num in [0, 1]:
+        st.error("High risk - Immediate clinical attention needed")
+
+  
 
     
     # Risk interpretation
@@ -572,4 +510,3 @@ if st.button(" Predict Disease Stage", type="primary", key="predict_btn"):  # �
 
 st.markdown("---")
 st.caption(" Built with Streamlit | ML Deployment | By Hemanth")
-
