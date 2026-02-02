@@ -363,6 +363,33 @@ if st.button(" Predict Disease Stage", type="primary"):
         ]
     )
 
+# Stage mapping for user-friendly display (LabelEncoder alphabetical order)
+stage_names = {
+    0: "Early",              # Alphabetical 1st
+    1: "Late",               # Alphabetical 2nd  
+    2: "Middle",             # Alphabetical 3rd
+    3: "Pre-Symptomatic"     # Alphabetical 4th
+}
+
+if st.button(" Predict Disease Stage", type="primary"):
+    input_data = pd.DataFrame(
+        [[
+            age, sex, family_history, htt_cag_repeat_length,
+            motor_symptoms, cognitive_decline, chorea_score,
+            brain_volume_loss, functional_capacity,
+            gene_mutation_type, htt_gene_expression_level,
+            protein_aggregation_level, gene_factor,
+            chromosome_location, function, effect, category
+        ]],
+        columns=[
+            "Age", "Sex", "Family_History", "HTT_CAG_Repeat_Length",
+            "Motor_Symptoms", "Cognitive_Decline", "Chorea_Score",
+            "Brain_Volume_Loss", "Functional_Capacity", "Gene_Mutation_Type",
+            "HTT_Gene_Expression_Level", "Protein_Aggregation_Level",
+            "Gene/Factor", "Chromosome_Location", "Function", "Effect", "Category"
+        ]
+    )
+
     # MLflow Pipeline handles preprocessing - pass DataFrame directly
     transformed_input = input_data
     
@@ -384,40 +411,76 @@ if st.button(" Predict Disease Stage", type="primary"):
             
             st.metric("Confidence", f"{confidence:.1f}%")
             
-            # Clean probability table
+            # Clean probability table with correct encoder order
             prob_df = pd.DataFrame({
-                "Disease Stage": [stage_names.get(int(i), f"Stage {i}") for i in model.classes_],
+                "Disease Stage": [stage_names.get(int(i), f"Stage {i}") for i in range(len(model.classes_))],
                 "Probability": [f"{p:.1%}" for p in proba]
             })
             st.dataframe(prob_df, use_container_width=True, hide_index=True)
     
     # Risk interpretation
-    # if prediction <= 1:
+    # if prediction == 3:
     #     st.info("Low risk - Early intervention recommended")
     # elif prediction == 2:
     #     st.warning("Moderate risk - Regular monitoring advised")
-    # else:
+    # elif prediction == 0 or prediction == 1:
     #     st.error("High risk - Immediate clinical attention needed")
 
-    # COMMENTED OUT - No preprocessing transformation
-    # transformed_input = preprocessor.transform(input_data)
-    transformed_input = input_data  # Use raw input directly
+    # # MLflow Pipeline handles preprocessing - pass DataFrame directly
+    # transformed_input = input_data
+    
+    # prediction = model.predict(transformed_input)[0]
+    # stage_display = stage_names.get(prediction, f"Stage {prediction}")
+    
+    # # Enhanced prediction display
+    # st.markdown("---")
+    # col1, col2 = st.columns([1, 3])
+    
+    # with col1:
+    #     st.success(f"**{stage_display}**")
+    #     st.caption(f"Label: `{prediction}`")
+    
+    # with col2:
+    #     if hasattr(model, "predict_proba"):
+    #         proba = model.predict_proba(transformed_input)[0]
+    #         confidence = float(np.max(proba) * 100)
+            
+    #         st.metric("Confidence", f"{confidence:.1f}%")
+            
+    #         # Clean probability table
+    #         prob_df = pd.DataFrame({
+    #             "Disease Stage": [stage_names.get(int(i), f"Stage {i}") for i in model.classes_],
+    #             "Probability": [f"{p:.1%}" for p in proba]
+    #         })
+    #         st.dataframe(prob_df, use_container_width=True, hide_index=True)
+    
+    # # Risk interpretation
+    # # if prediction <= 1:
+    # #     st.info("Low risk - Early intervention recommended")
+    # # elif prediction == 2:
+    # #     st.warning("Moderate risk - Regular monitoring advised")
+    # # else:
+    # #     st.error("High risk - Immediate clinical attention needed")
+
+    # # COMMENTED OUT - No preprocessing transformation
+    # # transformed_input = preprocessor.transform(input_data)
+    # transformed_input = input_data  # Use raw input directly
     
 
-    prediction = model.predict(transformed_input)[0]
+    # prediction = model.predict(transformed_input)[0]
 
-    st.success(f" **Predicted Disease Stage: {prediction}**")
+    # st.success(f" **Predicted Disease Stage: {prediction}**")
 
-    if hasattr(model, "predict_proba"):
-        proba = model.predict_proba(transformed_input)[0]
-        confidence = float(np.max(proba) * 100)
-        st.info(f" Prediction Confidence: **{confidence:.1f}%**")
+    # if hasattr(model, "predict_proba"):
+    #     proba = model.predict_proba(transformed_input)[0]
+    #     confidence = float(np.max(proba) * 100)
+    #     st.info(f" Prediction Confidence: **{confidence:.1f}%**")
 
-        prob_df = pd.DataFrame({
-            "Stage": model.classes_,
-            "Probability": [f"{p:.1%}" for p in proba]
-        })
-        st.dataframe(prob_df, use_container_width=True)
+    #     prob_df = pd.DataFrame({
+    #         "Stage": model.classes_,
+    #         "Probability": [f"{p:.1%}" for p in proba]
+    #     })
+    #     st.dataframe(prob_df, use_container_width=True)
 
 # if st.button(" Predict Disease Stage", type="primary"):
 
