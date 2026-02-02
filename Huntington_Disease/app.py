@@ -390,6 +390,33 @@ if st.button(" Predict Disease Stage", type="primary"):
         ]
     )
 
+ # Stage mapping for user-friendly display (LabelEncoder alphabetical order)
+stage_names = {
+    0: "Early",              
+    1: "Late",               
+    2: "Middle",             
+    3: "Pre-Symptomatic"     
+}
+
+if st.button(" Predict Disease Stage", type="primary", key="predict_btn"):  # ✅ UNIQUE KEY ADDED
+    input_data = pd.DataFrame(
+        [[
+            age, sex, family_history, htt_cag_repeat_length,
+            motor_symptoms, cognitive_decline, chorea_score,
+            brain_volume_loss, functional_capacity,
+            gene_mutation_type, htt_gene_expression_level,
+            protein_aggregation_level, gene_factor,
+            chromosome_location, function, effect, category
+        ]],
+        columns=[
+            "Age", "Sex", "Family_History", "HTT_CAG_Repeat_Length",
+            "Motor_Symptoms", "Cognitive_Decline", "Chorea_Score",
+            "Brain_Volume_Loss", "Functional_Capacity", "Gene_Mutation_Type",
+            "HTT_Gene_Expression_Level", "Protein_Aggregation_Level",
+            "Gene/Factor", "Chromosome_Location", "Function", "Effect", "Category"
+        ]
+    )
+
     # MLflow Pipeline handles preprocessing - pass DataFrame directly
     transformed_input = input_data
     
@@ -417,6 +444,8 @@ if st.button(" Predict Disease Stage", type="primary"):
                 "Probability": [f"{p:.1%}" for p in proba]
             })
             st.dataframe(prob_df, use_container_width=True, hide_index=True)
+    
+
     
     # Risk interpretation
     # if prediction == 3:
@@ -543,3 +572,4 @@ if st.button(" Predict Disease Stage", type="primary"):
 
 st.markdown("---")
 st.caption(" Built with Streamlit | ML Deployment | By Hemanth")
+
