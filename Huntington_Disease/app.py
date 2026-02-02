@@ -336,9 +336,8 @@ if st.button(" Predict Disease Stage", type="primary"):
         ]
     )
 
-    # COMMENTED OUT - No preprocessing transformation
-    # transformed_input = preprocessor.transform(input_data)
-    transformed_input = input_data  # Use raw input directly
+    # ✅ FIX: Convert to numpy array (Pipeline expects this)
+    transformed_input = input_data.values  # or input_data.to_numpy()
 
     prediction = model.predict(transformed_input)[0]
 
@@ -416,3 +415,4 @@ if st.button(" Predict Disease Stage", type="primary"):
 
 st.markdown("---")
 st.caption(" Built with Streamlit | ML Deployment | By Hemanth")
+
