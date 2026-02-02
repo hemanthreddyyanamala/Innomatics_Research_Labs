@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import pickle
 
+
+
 # -------------------------------
 # Custom CSS (unchanged)
 # -------------------------------
@@ -91,18 +93,26 @@ st.set_page_config(
 )
 
 st.title(" Huntington Disease Stage Prediction")
-st.write("Predict disease stage using genetic, clinical, and genetic modifier parameters.")
-
 
 @st.cache_resource
 def load_artifacts():
-    with open("Huntington_Disease/Huntington_Disease.pkl", "rb") as f:
+    with open("model.pkl", "rb") as f:
         model = pickle.load(f)
-    with open("Huntington_Disease/preprocessing.pkl", "rb") as f:
-        preprocessor = pickle.load(f)
-    return model, preprocessor
+    # with open("preprocessing.pkl", "rb") as f:
+    #     preprocessor = pickle.load(f)
+    return model, None  # Return None for preprocessor
 
-model, preprocessor = load_artifacts()
+model, preprocessor = load_artifacts()  # preprocessor will be None
+
+# @st.cache_resource
+# def load_artifacts():
+#     with open("model.pkl", "rb") as f:
+#         model = pickle.load(f)
+#     with open("preprocessing.pkl", "rb") as f:
+#         preprocessor = pickle.load(f)
+#     return model, preprocessor
+
+# model, preprocessor = load_artifacts()
 
 
 left_col, right_col = st.columns([2, 1])
@@ -266,7 +276,6 @@ with right_col:
     with st.expander("Gene/Factor"):
         st.markdown("""
         This tells **which DNA instruction is involved** in the disease:
-
         - **HTT** – The main Huntington disease gene; changes here directly cause the illness.  
         - **MLH1** – A DNA–repair helper gene that can change how strong or how early the disease is.  
         - **MSH3** – Another DNA–repair helper that can affect how much the CAG repeat grows.  
@@ -279,13 +288,10 @@ with right_col:
         **What this means:**  
         This is the **DNA address** where an important gene is found.  
         Each code tells which chromosome and which small region on it.
-
         - **4p16.3**  
         The address of the **HTT gene**, the main gene that causes Huntington’s disease when its CAG repeat is too long.  
-
         - **3p22.2**  
         The address of the **MLH1 gene**, a DNA‑repair gene that can change how the disease behaves.  
-
         - **5q14.1**  
         The address of the **MSH3 gene**, another DNA‑repair gene that can affect how much the CAG repeat grows.
         """)
@@ -311,51 +317,29 @@ with right_col:
             "- **Cis‑acting Modifier**: a nearby gene that also changes how severe the disease is."
         )
 
-
 if st.button(" Predict Disease Stage", type="primary"):
-
     input_data = pd.DataFrame(
         [[
-            age,
-            sex,
-            family_history,
-            htt_cag_repeat_length,
-            motor_symptoms,
-            cognitive_decline,
-            chorea_score,
-            brain_volume_loss,
-            functional_capacity,
-            gene_mutation_type,
-            htt_gene_expression_level,
-            protein_aggregation_level,
-            gene_factor,
-            chromosome_location,
-            function,
-            effect,
-            category
+            age, sex, family_history, htt_cag_repeat_length,
+            motor_symptoms, cognitive_decline, chorea_score,
+            brain_volume_loss, functional_capacity,
+            gene_mutation_type, htt_gene_expression_level,
+            protein_aggregation_level, gene_factor,
+            chromosome_location, function, effect, category
         ]],
         columns=[
-            "Age",
-            "Sex",
-            "Family_History",
-            "HTT_CAG_Repeat_Length",
-            "Motor_Symptoms",
-            "Cognitive_Decline",
-            "Chorea_Score",
-            "Brain_Volume_Loss",
-            "Functional_Capacity",
-            "Gene_Mutation_Type",
-            "HTT_Gene_Expression_Level",
-            "Protein_Aggregation_Level",
-            "Gene/Factor",
-            "Chromosome_Location",
-            "Function",
-            "Effect",
-            "Category"
+            "Age", "Sex", "Family_History", "HTT_CAG_Repeat_Length",
+            "Motor_Symptoms", "Cognitive_Decline", "Chorea_Score",
+            "Brain_Volume_Loss", "Functional_Capacity", "Gene_Mutation_Type",
+            "HTT_Gene_Expression_Level", "Protein_Aggregation_Level",
+            "Gene/Factor", "Chromosome_Location", "Function", "Effect", "Category"
         ]
     )
 
-    transformed_input = preprocessor.transform(input_data)
+    # COMMENTED OUT - No preprocessing transformation
+    # transformed_input = preprocessor.transform(input_data)
+    transformed_input = input_data  # Use raw input directly
+
     prediction = model.predict(transformed_input)[0]
 
     st.success(f" **Predicted Disease Stage: {prediction}**")
@@ -371,6 +355,64 @@ if st.button(" Predict Disease Stage", type="primary"):
         })
         st.dataframe(prob_df, use_container_width=True)
 
+# if st.button(" Predict Disease Stage", type="primary"):
+
+#     input_data = pd.DataFrame(
+#         [[
+#             age,
+#             sex,
+#             family_history,
+#             htt_cag_repeat_length,
+#             motor_symptoms,
+#             cognitive_decline,
+#             chorea_score,
+#             brain_volume_loss,
+#             functional_capacity,
+#             gene_mutation_type,
+#             htt_gene_expression_level,
+#             protein_aggregation_level,
+#             gene_factor,
+#             chromosome_location,
+#             function,
+#             effect,
+#             category
+#         ]],
+#         columns=[
+#             "Age",
+#             "Sex",
+#             "Family_History",
+#             "HTT_CAG_Repeat_Length",
+#             "Motor_Symptoms",
+#             "Cognitive_Decline",
+#             "Chorea_Score",
+#             "Brain_Volume_Loss",
+#             "Functional_Capacity",
+#             "Gene_Mutation_Type",
+#             "HTT_Gene_Expression_Level",
+#             "Protein_Aggregation_Level",
+#             "Gene/Factor",
+#             "Chromosome_Location",
+#             "Function",
+#             "Effect",
+#             "Category"
+#         ]
+#     )
+
+#     transformed_input = preprocessor.transform(input_data)
+#     prediction = model.predict(transformed_input)[0]
+
+#     st.success(f" **Predicted Disease Stage: {prediction}**")
+
+#     if hasattr(model, "predict_proba"):
+#         proba = model.predict_proba(transformed_input)[0]
+#         confidence = float(np.max(proba) * 100)
+#         st.info(f" Prediction Confidence: **{confidence:.1f}%**")
+
+#         prob_df = pd.DataFrame({
+#             "Stage": model.classes_,
+#             "Probability": [f"{p:.1%}" for p in proba]
+#         })
+#         st.dataframe(prob_df, use_container_width=True)
+
 st.markdown("---")
 st.caption(" Built with Streamlit | ML Deployment | By Hemanth")
-
