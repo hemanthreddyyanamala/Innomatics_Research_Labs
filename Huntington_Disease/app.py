@@ -88,39 +88,25 @@ st.markdown(
 # -------------------------------
 st.set_page_config(
     page_title="Huntington Disease Stage Prediction",
-    page_icon="",
+    page_icon="🧬",
     layout="centered"
 )
 
-st.title(" Huntington Disease Stage Prediction")
+st.title("🧬 Huntington Disease Stage Prediction")
 
 @st.cache_resource
 def load_artifacts():
     with open("model.pkl", "rb") as f:
         model = pickle.load(f)
-    # with open("preprocessing.pkl", "rb") as f:
-    #     preprocessor = pickle.load(f)
     return model, None  # Return None for preprocessor
 
 model, preprocessor = load_artifacts()  # preprocessor will be None
-
-# @st.cache_resource
-# def load_artifacts():
-#     with open("model.pkl", "rb") as f:
-#         model = pickle.load(f)
-#     with open("preprocessing.pkl", "rb") as f:
-#         preprocessor = pickle.load(f)
-#     return model, preprocessor
-
-# model, preprocessor = load_artifacts()
 
 
 left_col, right_col = st.columns([2, 1])
 
 
 with left_col:
-
-
     age = st.slider("Age", min_value=30, max_value=80, value=51)
 
     sex = st.selectbox("Sex", ["Female", "Male"], index=1)
@@ -149,9 +135,6 @@ with left_col:
         min_value=0.0, max_value=30.0, value=10.0, step=0.5
     )
 
-    
-
-
     brain_volume_loss = st.slider(
         "Brain Volume Loss (%)",
         min_value=0.0, max_value=15.0, value=5.0, step=0.1
@@ -171,7 +154,6 @@ with left_col:
         "Protein Aggregation Level",
         min_value=0.0, max_value=5.0, value=1.0, step=0.01
     )
-
 
     gene_mutation_type = st.selectbox(
         "Gene Mutation Type",
@@ -202,7 +184,7 @@ with left_col:
     )
 
 with right_col:
-    st.subheader(" What does each field mean?")
+    st.subheader("ℹ️ What does each field mean?")
 
     with st.expander("Age"):
         st.markdown(
@@ -216,7 +198,7 @@ with right_col:
 
     with st.expander("Family History"):
         st.markdown(
-            "Shows if close family members also have Huntington’s disease. If **Yes**, the chance of having it is higher."
+            "Shows if close family members also have Huntington's disease. If **Yes**, the chance of having it is higher."
         )
 
     with st.expander("HTT CAG Repeat Length"):
@@ -241,7 +223,7 @@ with right_col:
 
     with st.expander("Chorea Score"):
         st.markdown(
-            "A number that tells how bad the ‘dance‑like’ movements are. **0** means no extra movements; higher numbers mean more movement problems."
+            "A number that tells how bad the 'dance‑like' movements are. **0** means no extra movements; higher numbers mean more movement problems."
         )
 
     with st.expander("Brain Volume Loss"):
@@ -282,20 +264,18 @@ with right_col:
         - **HTT (Somatic Expansion)** – The same HTT gene, but this name is used when its CAG repeats keep growing inside brain cells over time.
         """)
 
-
     with st.expander("Chromosome Location"):
         st.markdown("""
         **What this means:**  
         This is the **DNA address** where an important gene is found.  
         Each code tells which chromosome and which small region on it.
         - **4p16.3**  
-        The address of the **HTT gene**, the main gene that causes Huntington’s disease when its CAG repeat is too long.  
+        The address of the **HTT gene**, the main gene that causes Huntington's disease when its CAG repeat is too long.  
         - **3p22.2**  
         The address of the **MLH1 gene**, a DNA‑repair gene that can change how the disease behaves.  
         - **5q14.1**  
         The address of the **MSH3 gene**, another DNA‑repair gene that can affect how much the CAG repeat grows.
         """)
-
 
     with st.expander("Function"):
         st.markdown(
@@ -328,6 +308,7 @@ stage_names = {
 # ✅ FIXED: Single button with unique key
 if st.button("Predict Disease Stage", type="primary", key="unique_predict_btn"):
     
+    # Create input DataFrame
     input_data = pd.DataFrame(
         [[
             age, sex, family_history, htt_cag_repeat_length,
@@ -346,7 +327,26 @@ if st.button("Predict Disease Stage", type="primary", key="unique_predict_btn"):
         ]
     )
 
-    # Model expects DataFrame - handles preprocessing internally
+    # ✅ Encode categorical variables to match training data
+    categorical_mappings = {
+        "Sex": {"Female": 0, "Male": 1},
+        "Family_History": {"No": 0, "Yes": 1},
+        "Motor_Symptoms": {"Mild": 0, "Moderate": 1, "Severe": 2},
+        "Cognitive_Decline": {"Mild": 0, "Moderate": 1, "Severe": 2},
+        "Gene_Mutation_Type": {"Deletion": 0, "Duplication": 1, "Insertion": 2, "Point Mutation": 3},
+        "Gene/Factor": {"HTT": 0, "HTT (Somatic Expansion)": 1, "MLH1": 2, "MSH3": 3},
+        "Chromosome_Location": {"3p22.2": 0, "4p16.3": 1, "5q14.1": 2},
+        "Function": {"Mismatch Repair": 0},
+        "Effect": {"CAG Repeat Expansion": 0, "Faster Disease Onset": 1, "Neurodegeneration": 2},
+        "Category": {"Cis-acting Modifier": 0, "Primary Cause": 1, "Trans-acting Modifier": 2}
+    }
+    
+    # Apply encodings
+    for col, mapping in categorical_mappings.items():
+        if col in input_data.columns:
+            input_data[col] = input_data[col].map(mapping)
+    
+    # Make prediction with encoded data
     prediction_num = model.predict(input_data)[0]
     
     # ✅ Convert numeric prediction to readable string
@@ -376,137 +376,11 @@ if st.button("Predict Disease Stage", type="primary", key="unique_predict_btn"):
     
     # Clinical interpretation based on numeric prediction
     if prediction_num == 3:
-        st.info("Low risk - Early intervention recommended")
+        st.info("✅ Low risk - Early intervention recommended")
     elif prediction_num == 2:
-        st.warning("Moderate risk - Regular monitoring advised")
+        st.warning("⚠️ Moderate risk - Regular monitoring advised")
     elif prediction_num in [0, 1]:
-        st.error("High risk - Immediate clinical attention needed")
-
-  
-
-    
-    # Risk interpretation
-    # if prediction == 3:
-    #     st.info("Low risk - Early intervention recommended")
-    # elif prediction == 2:
-    #     st.warning("Moderate risk - Regular monitoring advised")
-    # elif prediction == 0 or prediction == 1:
-    #     st.error("High risk - Immediate clinical attention needed")
-
-    # # MLflow Pipeline handles preprocessing - pass DataFrame directly
-    # transformed_input = input_data
-    
-    # prediction = model.predict(transformed_input)[0]
-    # stage_display = stage_names.get(prediction, f"Stage {prediction}")
-    
-    # # Enhanced prediction display
-    # st.markdown("---")
-    # col1, col2 = st.columns([1, 3])
-    
-    # with col1:
-    #     st.success(f"**{stage_display}**")
-    #     st.caption(f"Label: `{prediction}`")
-    
-    # with col2:
-    #     if hasattr(model, "predict_proba"):
-    #         proba = model.predict_proba(transformed_input)[0]
-    #         confidence = float(np.max(proba) * 100)
-            
-    #         st.metric("Confidence", f"{confidence:.1f}%")
-            
-    #         # Clean probability table
-    #         prob_df = pd.DataFrame({
-    #             "Disease Stage": [stage_names.get(int(i), f"Stage {i}") for i in model.classes_],
-    #             "Probability": [f"{p:.1%}" for p in proba]
-    #         })
-    #         st.dataframe(prob_df, use_container_width=True, hide_index=True)
-    
-    # # Risk interpretation
-    # # if prediction <= 1:
-    # #     st.info("Low risk - Early intervention recommended")
-    # # elif prediction == 2:
-    # #     st.warning("Moderate risk - Regular monitoring advised")
-    # # else:
-    # #     st.error("High risk - Immediate clinical attention needed")
-
-    # # COMMENTED OUT - No preprocessing transformation
-    # # transformed_input = preprocessor.transform(input_data)
-    # transformed_input = input_data  # Use raw input directly
-    
-
-    # prediction = model.predict(transformed_input)[0]
-
-    # st.success(f" **Predicted Disease Stage: {prediction}**")
-
-    # if hasattr(model, "predict_proba"):
-    #     proba = model.predict_proba(transformed_input)[0]
-    #     confidence = float(np.max(proba) * 100)
-    #     st.info(f" Prediction Confidence: **{confidence:.1f}%**")
-
-    #     prob_df = pd.DataFrame({
-    #         "Stage": model.classes_,
-    #         "Probability": [f"{p:.1%}" for p in proba]
-    #     })
-    #     st.dataframe(prob_df, use_container_width=True)
-
-# if st.button(" Predict Disease Stage", type="primary"):
-
-#     input_data = pd.DataFrame(
-#         [[
-#             age,
-#             sex,
-#             family_history,
-#             htt_cag_repeat_length,
-#             motor_symptoms,
-#             cognitive_decline,
-#             chorea_score,
-#             brain_volume_loss,
-#             functional_capacity,
-#             gene_mutation_type,
-#             htt_gene_expression_level,
-#             protein_aggregation_level,
-#             gene_factor,
-#             chromosome_location,
-#             function,
-#             effect,
-#             category
-#         ]],
-#         columns=[
-#             "Age",
-#             "Sex",
-#             "Family_History",
-#             "HTT_CAG_Repeat_Length",
-#             "Motor_Symptoms",
-#             "Cognitive_Decline",
-#             "Chorea_Score",
-#             "Brain_Volume_Loss",
-#             "Functional_Capacity",
-#             "Gene_Mutation_Type",
-#             "HTT_Gene_Expression_Level",
-#             "Protein_Aggregation_Level",
-#             "Gene/Factor",
-#             "Chromosome_Location",
-#             "Function",
-#             "Effect",
-#             "Category"
-#         ]
-#     )
-
-#     transformed_input = preprocessor.transform(input_data)
-#     prediction = model.predict(transformed_input)[0]
-
-#     st.success(f" **Predicted Disease Stage: {prediction}**")
-
-#     if hasattr(model, "predict_proba"):
-#         proba = model.predict_proba(transformed_input)[0]
-#         confidence = float(np.max(proba) * 100)
-#         st.info(f" Prediction Confidence: **{confidence:.1f}%**")
-
-#         prob_df = pd.DataFrame({
-#             "Stage": model.classes_,
-#             "Probability": [f"{p:.1%}" for p in proba]
-#         })
-#         st.dataframe(prob_df, use_container_width=True)
+        st.error("🚨 High risk - Immediate clinical attention needed")
 
 st.markdown("---")
-st.caption(" Built with Streamlit | ML Deployment | By Hemanth")
+st.caption("🔬 Built with Streamlit | ML Deployment | By Hemanth")
