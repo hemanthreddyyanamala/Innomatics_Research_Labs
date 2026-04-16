@@ -597,9 +597,9 @@ in the Software without restriction...
 
 **Project Maintainer:** [Your Name]
 
-- 📧 Email: your.email@example.com
-- 💼 LinkedIn: [Your LinkedIn Profile](https://linkedin.com/in/yourprofile)
-- 🐙 GitHub: [@yourusername](https://github.com/yourusername)
+- 📧 Email: [hemanthreddyyanamala73@gmail.com](hemanthreddyyanamala73@gmail.com)
+- 🐙 GitHub: [Hemanth Reddy Yanamala](https://github.com/hemanthreddyyanamala)
+- 💼 LinkedIn: [@Yanamala Hemanth Reddy](https://www.linkedin.com/in/yanamala-hemanth-reddy/)
 - 🌐 Portfolio: [yourwebsite.com](https://yourwebsite.com)
 
 **Project Link:** [https://github.com/yourusername/insurance-fraud-detection](https://github.com/yourusername/insurance-fraud-detection)
@@ -618,23 +618,12 @@ in the Software without restriction...
 
 ---
 
-## 📚 References & Resources
-
-### Research Papers
-1. [XGBoost: A Scalable Tree Boosting System](https://arxiv.org/abs/1603.02754)
-2. [Fraud Detection: A Systematic Review](link-to-paper)
-3. [Handling Imbalanced Datasets](link-to-paper)
-
 ### Documentation
 - [Scikit-learn Documentation](https://scikit-learn.org/)
 - [XGBoost Documentation](https://xgboost.readthedocs.io/)
 - [MLflow Documentation](https://mlflow.org/docs/latest/index.html)
 - [Optuna Documentation](https://optuna.readthedocs.io/)
 
-### Tutorials
-- [Fraud Detection Best Practices](link)
-- [MLOps for Production ML](link)
-- [Hyperparameter Tuning Guide](link)
 
 ---
 
