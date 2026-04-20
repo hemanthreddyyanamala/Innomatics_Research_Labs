@@ -20,6 +20,7 @@ Insurance fraud detection application built with Streamlit. Upload and analyze h
 - **Workflow-Driven** - Implements anomaly detection, ensemble modeling, threshold tuning, and audit pipelines.
 
 ## Steps to Run
+note: model.pkl and preprocessing.pkl are too big and stored at : https://huggingface.co/spaces/hemanth003/InsuranceFraudDetection/tree/main
 
 1. **Clone** the project
    ```bash 
